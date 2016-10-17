@@ -1,0 +1,17 @@
+[DEFAULT]
+customerid = 1111
+status = 1
+severity = 7
+
+[connection]
+username = user
+password = pass
+isv = abcde12345
+ien_server = ien.com.tw
+#proxy = proxy.hinet.net:80
+
+[email]
+smtp_server = msa.hinet.net
+sender = sender@msa.hinet.net
+recipient = user1@msa.hinet.net, user2@msa.hinet.net
+subject = daily event
