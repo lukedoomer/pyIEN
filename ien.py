@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import zeep, configparser, smtplib, pprint, socket
+import zeep, configparser, smtplib, pprint
 import xml.etree.ElementTree as ET
 from email.mime.text import MIMEText
 
@@ -8,18 +8,16 @@ config = configparser.ConfigParser()
 config.read('api.conf')
 mail_content = ''
 
+transport = zeep.Transport(verify = False)
+if config.has_option('connection', 'proxy'):
+	transport.session.proxies = {'http': config['connection']['proxy'], 'https': config['connection']['proxy']}
+
 try:
 	portal_wsdl = 'https://' + config['connection']['ien_server'] + '/portal/services/IsvWebService?wsdl'
-	portal_client = zeep.Client(wsdl = portal_wsdl )
-	portal_client.transport.session.verify = False
+	portal_client = zeep.Client(wsdl = portal_wsdl, transport = transport)
 
 	ienc_wsdl = 'https://' + config['connection']['ien_server'] + '/ienc/services/IsvService?wsdl'
-	ienc_client = zeep.Client(wsdl = ienc_wsdl )
-	ienc_client.transport.session.verify = False
-
-	if config.has_option('connection', 'proxy'):
-		portal_client.transport.session.proxies = {'http': config['connection']['proxy'], 'https': config['connection']['proxy']}
-		ienc_client.transport.session.proxies = {'http': config['connection']['proxy'], 'https': config['connection']['proxy']}
+	ienc_client = zeep.Client(wsdl = ienc_wsdl, transport = transport)
 
 	portal_result = portal_client.service.apiLogin(config['connection']['username'], config['connection']['password'], config['connection']['isv'])
 	portal_root = ET.fromstring(portal_result)
@@ -44,11 +42,11 @@ else:
 		if event['status'] == int(config['DEFAULT']['status']) and event["severity"] <= int(config['DEFAULT']['severity']):
 			mail_content += pprint.pformat(event) +'\n'
 finally:
-	"""msg = MIMEText(mail_content)
+	msg = MIMEText(mail_content)
 	msg['Subject'] = config['email']['subject']
 	msg['From'] = config['email']['sender']
 	msg['To'] = config['email']['recipient']
 	smtp = smtplib.SMTP(config['email']['smtp_server'])
 	smtp.send_message(msg)
-	smtp.quit()"""
+	smtp.quit()
 	print(mail_content)
