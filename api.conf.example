@@ -1,13 +1,18 @@
 [DEFAULT]
 customerid = 1111
+# -1: all 0: closed 1: open, 2: solved
 status = 1
+# -1: 所有, 4: 錯誤, 5: 警告, 6: 注意, 7: 資訊
 severity = 7
+# check how many past days from now
+days = 30
 
 [connection]
 username = user
 password = pass
 isv = abcde12345
 ien_server = ien.com.tw
+# uncomment the line if you are using proxy
 #proxy = proxy.hinet.net:80
 
 [email]

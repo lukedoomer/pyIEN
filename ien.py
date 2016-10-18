@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import zeep, configparser, smtplib, pprint
+import zeep, configparser, smtplib, pprint, datetime
 import xml.etree.ElementTree as ET
 from email.mime.text import MIMEText
 
@@ -24,7 +24,9 @@ try:
 	for element in portal_root.iter('AuthCode'):
 		authcode = element.text
 
-	ienc_result = ienc_client.service.getAlarmReport(authcode, config['connection']['isv'], config['DEFAULT']['customerid'],[],'2016/10/13','2016/10/14', -1, -1)
+	check_from_date = datetime.date.today() - datetime.timedelta(days = int(config['DEFAULT']['days']))
+
+	ienc_result = ienc_client.service.getAlarmReport(authcode, config['connection']['isv'], config['DEFAULT']['customerid'], [], check_from_date.strftime('%Y/%m/%d'), '', -1, -1)
 	ienc_root = ET.fromstring(ienc_result)
 	for element in ienc_root.iter('Data'):
 		report = element.text
